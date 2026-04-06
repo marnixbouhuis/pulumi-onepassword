@@ -32,6 +32,15 @@
             }
         },
         "datasources": {
+            "onepassword_environment": {
+                "current": "onepassword:index/getEnvironment:getEnvironment",
+                "majorVersion": 1,
+                "fields": {
+                    "metadata": {
+                        "maxItemsOne": false
+                    }
+                }
+            },
             "onepassword_item": {
                 "current": "onepassword:index/getItem:getItem",
                 "majorVersion": 1,

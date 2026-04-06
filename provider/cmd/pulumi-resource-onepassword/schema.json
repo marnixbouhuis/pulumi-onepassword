@@ -58,25 +58,25 @@
         "variables": {
             "account": {
                 "type": "string",
-                "description": "A valid account's sign-in address or ID to use biometrics unlock. Can also be sourced from `OP_ACCOUNT` environment\nvariable. Provider will use the 1Password CLI if set.\n",
+                "description": "A valid account name or ID to use desktop app authentication. Can also be sourced from `OP_ACCOUNT` environment variable.",
                 "defaultInfo": {
                     "environment": [
                         "OP_ACCOUNT"
                     ]
                 }
             },
-            "opCliPath": {
+            "connectToken": {
                 "type": "string",
-                "description": "The path to the 1Password CLI binary. Can also be sourced from `OP_CLI_PATH` environment variable. Defaults to `op`.\n",
-                "defaultInfo": {
-                    "environment": [
-                        "OP_CLI_PATH"
-                    ]
-                }
+                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable. Provider will use 1Password Connect server if set.",
+                "secret": true
+            },
+            "connectUrl": {
+                "type": "string",
+                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment variable. Provider will use 1Password Connect server if set."
             },
             "serviceAccountToken": {
                 "type": "string",
-                "description": "A valid 1Password service account token. Can also be sourced from `OP_SERVICE_ACCOUNT_TOKEN` environment variable.\nProvider will use the 1Password CLI if set.\n",
+                "description": "A valid 1Password service account token. Can also be sourced from `OP_SERVICE_ACCOUNT_TOKEN` environment variable.",
                 "defaultInfo": {
                     "environment": [
                         "OP_SERVICE_ACCOUNT_TOKEN"
@@ -86,22 +86,24 @@
             },
             "token": {
                 "type": "string",
-                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable.\nProvider will use 1Password Connect server if set.\n",
+                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable. Provider will use 1Password Connect server if set. Deprecated: Use \u003cspan pulumi-lang-nodejs=\"`connectToken`\" pulumi-lang-dotnet=\"`ConnectToken`\" pulumi-lang-go=\"`connectToken`\" pulumi-lang-python=\"`connect_token`\" pulumi-lang-yaml=\"`connectToken`\" pulumi-lang-java=\"`connectToken`\"\u003e`connectToken`\u003c/span\u003e instead.",
                 "defaultInfo": {
                     "environment": [
                         "OP_CONNECT_TOKEN"
                     ]
                 },
+                "deprecationMessage": "The \"token\" field is deprecated and will be removed in a future version. Use \u003cspan pulumi-lang-nodejs=\"\"connectToken\"\" pulumi-lang-dotnet=\"\"ConnectToken\"\" pulumi-lang-go=\"\"connectToken\"\" pulumi-lang-python=\"\"connect_token\"\" pulumi-lang-yaml=\"\"connectToken\"\" pulumi-lang-java=\"\"connectToken\"\"\u003e\"connectToken\"\u003c/span\u003e instead.",
                 "secret": true
             },
             "url": {
                 "type": "string",
-                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment\nvariable. Provider will use 1Password Connect server if set.\n",
+                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment variable. Provider will use 1Password Connect server if set. Deprecated: Use \u003cspan pulumi-lang-nodejs=\"`connectUrl`\" pulumi-lang-dotnet=\"`ConnectUrl`\" pulumi-lang-go=\"`connectUrl`\" pulumi-lang-python=\"`connect_url`\" pulumi-lang-yaml=\"`connectUrl`\" pulumi-lang-java=\"`connectUrl`\"\u003e`connectUrl`\u003c/span\u003e instead.",
                 "defaultInfo": {
                     "environment": [
                         "OP_CONNECT_HOST"
                     ]
-                }
+                },
+                "deprecationMessage": "The \"url\" field is deprecated and will be removed in a future version. Use \u003cspan pulumi-lang-nodejs=\"\"connectUrl\"\" pulumi-lang-dotnet=\"\"ConnectUrl\"\" pulumi-lang-go=\"\"connectUrl\"\" pulumi-lang-python=\"\"connect_url\"\" pulumi-lang-yaml=\"\"connectUrl\"\" pulumi-lang-java=\"\"connectUrl\"\"\u003e\"connectUrl\"\u003c/span\u003e instead."
             }
         }
     },
@@ -116,10 +118,6 @@
                     "type": "integer",
                     "description": "The length of the password to be generated.\n"
                 },
-                "letters": {
-                    "type": "boolean",
-                    "description": "Use letters [a-zA-Z] when generating the password.\n"
-                },
                 "symbols": {
                     "type": "boolean",
                     "description": "Use symbols [!@.-_*] when generating the password.\n"
@@ -131,7 +129,6 @@
                     "requiredOutputs": [
                         "digits",
                         "length",
-                        "letters",
                         "symbols"
                     ]
                 }
@@ -144,7 +141,7 @@
                     "items": {
                         "$ref": "#/types/onepassword:index/ItemSectionField:ItemSectionField"
                     },
-                    "description": "A list of custom fields in the section.\n"
+                    "description": "A list of custom fields in the section\n"
                 },
                 "id": {
                     "type": "string",
@@ -182,10 +179,6 @@
                     "$ref": "#/types/onepassword:index/ItemSectionFieldPasswordRecipe:ItemSectionFieldPasswordRecipe",
                     "description": "The recipe used to generate a new value for a password.\n"
                 },
-                "purpose": {
-                    "type": "string",
-                    "description": "Purpose indicates this is a special field: a username, password, or notes field. One of [\"USERNAME\" \"PASSWORD\" \"NOTES\"]\n"
-                },
                 "type": {
                     "type": "string",
                     "description": "The type of value stored in the field. One of [\"STRING\" \"CONCEALED\" \"EMAIL\" \"URL\" \"OTP\" \"DATE\" \"MONTH_YEAR\" \"MENU\"]\n"
@@ -221,9 +214,85 @@
                     "type": "integer",
                     "description": "The length of the password to be generated.\n"
                 },
-                "letters": {
+                "symbols": {
                     "type": "boolean",
-                    "description": "Use letters [a-zA-Z] when generating the password.\n"
+                    "description": "Use symbols [!@.-_*] when generating the password.\n"
+                }
+            },
+            "type": "object",
+            "language": {
+                "nodejs": {
+                    "requiredOutputs": [
+                        "digits",
+                        "length",
+                        "symbols"
+                    ]
+                }
+            }
+        },
+        "onepassword:index/ItemSectionMap:ItemSectionMap": {
+            "properties": {
+                "fieldMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/types/onepassword:index/ItemSectionMapFieldMap:ItemSectionMapFieldMap"
+                    },
+                    "description": "A map of custom fields in the section, keyed by field label.\n"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "A unique identifier for the section.\n"
+                }
+            },
+            "type": "object",
+            "language": {
+                "nodejs": {
+                    "requiredOutputs": [
+                        "id"
+                    ]
+                }
+            }
+        },
+        "onepassword:index/ItemSectionMapFieldMap:ItemSectionMapFieldMap": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "A unique identifier for the field.\n"
+                },
+                "passwordRecipe": {
+                    "$ref": "#/types/onepassword:index/ItemSectionMapFieldMapPasswordRecipe:ItemSectionMapFieldMapPasswordRecipe",
+                    "description": "The recipe used to generate a new value for a password.\n"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "The type of value stored in the field. One of [\"STRING\" \"CONCEALED\" \"EMAIL\" \"URL\" \"OTP\" \"DATE\" \"MONTH_YEAR\" \"MENU\"]\n"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "The value of the field.\n",
+                    "secret": true
+                }
+            },
+            "type": "object",
+            "language": {
+                "nodejs": {
+                    "requiredOutputs": [
+                        "id",
+                        "type",
+                        "value"
+                    ]
+                }
+            }
+        },
+        "onepassword:index/ItemSectionMapFieldMapPasswordRecipe:ItemSectionMapFieldMapPasswordRecipe": {
+            "properties": {
+                "digits": {
+                    "type": "boolean",
+                    "description": "Use digits [0-9] when generating the password.\n"
+                },
+                "length": {
+                    "type": "integer",
+                    "description": "The length of the password to be generated.\n"
                 },
                 "symbols": {
                     "type": "boolean",
@@ -236,9 +305,36 @@
                     "requiredOutputs": [
                         "digits",
                         "length",
-                        "letters",
                         "symbols"
                     ]
+                }
+            }
+        },
+        "onepassword:index/getEnvironmentMetadata:getEnvironmentMetadata": {
+            "properties": {
+                "masked": {
+                    "type": "boolean",
+                    "description": "Whether the value is hidden by default in the 1Password app.\n"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The environment variable name.\n"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "The environment variable value.\n",
+                    "secret": true
+                }
+            },
+            "type": "object",
+            "required": [
+                "masked",
+                "name",
+                "value"
+            ],
+            "language": {
+                "nodejs": {
+                    "requiredInputs": []
                 }
             }
         },
@@ -282,7 +378,8 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/types/onepassword:index/getItemSectionField:getItemSectionField"
-                    }
+                    },
+                    "description": "A list of custom fields in the section\n"
                 },
                 "files": {
                     "type": "array",
@@ -321,10 +418,6 @@
                     "type": "string",
                     "description": "The label for the field.\n"
                 },
-                "purpose": {
-                    "type": "string",
-                    "description": "Purpose indicates this is a special field: a username, password, or notes field. One of [\"USERNAME\" \"PASSWORD\" \"NOTES\"]\n"
-                },
                 "type": {
                     "type": "string",
                     "description": "The type of value stored in the field. One of [\"STRING\" \"CONCEALED\" \"EMAIL\" \"URL\" \"OTP\" \"DATE\" \"MONTH_YEAR\" \"MENU\"]\n"
@@ -339,7 +432,6 @@
             "required": [
                 "id",
                 "label",
-                "purpose",
                 "type",
                 "value"
             ],
@@ -382,6 +474,96 @@
                     "requiredInputs": []
                 }
             }
+        },
+        "onepassword:index/getItemSectionMap:getItemSectionMap": {
+            "properties": {
+                "fieldMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/types/onepassword:index/getItemSectionMapFieldMap:getItemSectionMapFieldMap"
+                    },
+                    "description": "A map of custom fields in the section, keyed by field label.\n"
+                },
+                "fileMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/types/onepassword:index/getItemSectionMapFileMap:getItemSectionMapFileMap"
+                    },
+                    "description": "A map of files attached to the section, keyed by file label.\n"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "A unique identifier for the section.\n"
+                }
+            },
+            "type": "object",
+            "required": [
+                "fieldMap",
+                "fileMap",
+                "id"
+            ],
+            "language": {
+                "nodejs": {
+                    "requiredInputs": []
+                }
+            }
+        },
+        "onepassword:index/getItemSectionMapFieldMap:getItemSectionMapFieldMap": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "A unique identifier for the field.\n"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "The type of value stored in the field. One of [\"STRING\" \"CONCEALED\" \"EMAIL\" \"URL\" \"OTP\" \"DATE\" \"MONTH_YEAR\" \"MENU\"]\n"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "The value of the field.\n",
+                    "secret": true
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "type",
+                "value"
+            ],
+            "language": {
+                "nodejs": {
+                    "requiredInputs": []
+                }
+            }
+        },
+        "onepassword:index/getItemSectionMapFileMap:getItemSectionMapFileMap": {
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "description": "The content of the file.\n",
+                    "secret": true
+                },
+                "contentBase64": {
+                    "type": "string",
+                    "description": "The content of the file in base64 encoding. (Use this for binary files.)\n",
+                    "secret": true
+                },
+                "id": {
+                    "type": "string",
+                    "description": "The UUID of the file.\n"
+                }
+            },
+            "type": "object",
+            "required": [
+                "content",
+                "contentBase64",
+                "id"
+            ],
+            "language": {
+                "nodejs": {
+                    "requiredInputs": []
+                }
+            }
         }
     },
     "provider": {
@@ -389,49 +571,56 @@
         "properties": {
             "account": {
                 "type": "string",
-                "description": "A valid account's sign-in address or ID to use biometrics unlock. Can also be sourced from `OP_ACCOUNT` environment\nvariable. Provider will use the 1Password CLI if set.\n"
+                "description": "A valid account name or ID to use desktop app authentication. Can also be sourced from `OP_ACCOUNT` environment variable."
             },
-            "opCliPath": {
+            "connectToken": {
                 "type": "string",
-                "description": "The path to the 1Password CLI binary. Can also be sourced from `OP_CLI_PATH` environment variable. Defaults to `op`.\n"
+                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable. Provider will use 1Password Connect server if set.",
+                "secret": true
+            },
+            "connectUrl": {
+                "type": "string",
+                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment variable. Provider will use 1Password Connect server if set."
             },
             "serviceAccountToken": {
                 "type": "string",
-                "description": "A valid 1Password service account token. Can also be sourced from `OP_SERVICE_ACCOUNT_TOKEN` environment variable.\nProvider will use the 1Password CLI if set.\n",
+                "description": "A valid 1Password service account token. Can also be sourced from `OP_SERVICE_ACCOUNT_TOKEN` environment variable.",
                 "secret": true
             },
             "token": {
                 "type": "string",
-                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable.\nProvider will use 1Password Connect server if set.\n",
+                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable. Provider will use 1Password Connect server if set. Deprecated: Use \u003cspan pulumi-lang-nodejs=\"`connectToken`\" pulumi-lang-dotnet=\"`ConnectToken`\" pulumi-lang-go=\"`connectToken`\" pulumi-lang-python=\"`connect_token`\" pulumi-lang-yaml=\"`connectToken`\" pulumi-lang-java=\"`connectToken`\"\u003e`connectToken`\u003c/span\u003e instead.",
+                "deprecationMessage": "The \"token\" field is deprecated and will be removed in a future version. Use \u003cspan pulumi-lang-nodejs=\"\"connectToken\"\" pulumi-lang-dotnet=\"\"ConnectToken\"\" pulumi-lang-go=\"\"connectToken\"\" pulumi-lang-python=\"\"connect_token\"\" pulumi-lang-yaml=\"\"connectToken\"\" pulumi-lang-java=\"\"connectToken\"\"\u003e\"connectToken\"\u003c/span\u003e instead.",
                 "secret": true
             },
             "url": {
                 "type": "string",
-                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment\nvariable. Provider will use 1Password Connect server if set.\n"
+                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment variable. Provider will use 1Password Connect server if set. Deprecated: Use \u003cspan pulumi-lang-nodejs=\"`connectUrl`\" pulumi-lang-dotnet=\"`ConnectUrl`\" pulumi-lang-go=\"`connectUrl`\" pulumi-lang-python=\"`connect_url`\" pulumi-lang-yaml=\"`connectUrl`\" pulumi-lang-java=\"`connectUrl`\"\u003e`connectUrl`\u003c/span\u003e instead.",
+                "deprecationMessage": "The \"url\" field is deprecated and will be removed in a future version. Use \u003cspan pulumi-lang-nodejs=\"\"connectUrl\"\" pulumi-lang-dotnet=\"\"ConnectUrl\"\" pulumi-lang-go=\"\"connectUrl\"\" pulumi-lang-python=\"\"connect_url\"\" pulumi-lang-yaml=\"\"connectUrl\"\" pulumi-lang-java=\"\"connectUrl\"\"\u003e\"connectUrl\"\u003c/span\u003e instead."
             }
         },
         "inputProperties": {
             "account": {
                 "type": "string",
-                "description": "A valid account's sign-in address or ID to use biometrics unlock. Can also be sourced from `OP_ACCOUNT` environment\nvariable. Provider will use the 1Password CLI if set.\n",
+                "description": "A valid account name or ID to use desktop app authentication. Can also be sourced from `OP_ACCOUNT` environment variable.",
                 "defaultInfo": {
                     "environment": [
                         "OP_ACCOUNT"
                     ]
                 }
             },
-            "opCliPath": {
+            "connectToken": {
                 "type": "string",
-                "description": "The path to the 1Password CLI binary. Can also be sourced from `OP_CLI_PATH` environment variable. Defaults to `op`.\n",
-                "defaultInfo": {
-                    "environment": [
-                        "OP_CLI_PATH"
-                    ]
-                }
+                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable. Provider will use 1Password Connect server if set.",
+                "secret": true
+            },
+            "connectUrl": {
+                "type": "string",
+                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment variable. Provider will use 1Password Connect server if set."
             },
             "serviceAccountToken": {
                 "type": "string",
-                "description": "A valid 1Password service account token. Can also be sourced from `OP_SERVICE_ACCOUNT_TOKEN` environment variable.\nProvider will use the 1Password CLI if set.\n",
+                "description": "A valid 1Password service account token. Can also be sourced from `OP_SERVICE_ACCOUNT_TOKEN` environment variable.",
                 "defaultInfo": {
                     "environment": [
                         "OP_SERVICE_ACCOUNT_TOKEN"
@@ -441,92 +630,122 @@
             },
             "token": {
                 "type": "string",
-                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable.\nProvider will use 1Password Connect server if set.\n",
+                "description": "A valid token for your 1Password Connect server. Can also be sourced from `OP_CONNECT_TOKEN` environment variable. Provider will use 1Password Connect server if set. Deprecated: Use \u003cspan pulumi-lang-nodejs=\"`connectToken`\" pulumi-lang-dotnet=\"`ConnectToken`\" pulumi-lang-go=\"`connectToken`\" pulumi-lang-python=\"`connect_token`\" pulumi-lang-yaml=\"`connectToken`\" pulumi-lang-java=\"`connectToken`\"\u003e`connectToken`\u003c/span\u003e instead.",
                 "defaultInfo": {
                     "environment": [
                         "OP_CONNECT_TOKEN"
                     ]
                 },
+                "deprecationMessage": "The \"token\" field is deprecated and will be removed in a future version. Use \u003cspan pulumi-lang-nodejs=\"\"connectToken\"\" pulumi-lang-dotnet=\"\"ConnectToken\"\" pulumi-lang-go=\"\"connectToken\"\" pulumi-lang-python=\"\"connect_token\"\" pulumi-lang-yaml=\"\"connectToken\"\" pulumi-lang-java=\"\"connectToken\"\"\u003e\"connectToken\"\u003c/span\u003e instead.",
                 "secret": true
             },
             "url": {
                 "type": "string",
-                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment\nvariable. Provider will use 1Password Connect server if set.\n",
+                "description": "The HTTP(S) URL where your 1Password Connect server can be found. Can also be sourced `OP_CONNECT_HOST` environment variable. Provider will use 1Password Connect server if set. Deprecated: Use \u003cspan pulumi-lang-nodejs=\"`connectUrl`\" pulumi-lang-dotnet=\"`ConnectUrl`\" pulumi-lang-go=\"`connectUrl`\" pulumi-lang-python=\"`connect_url`\" pulumi-lang-yaml=\"`connectUrl`\" pulumi-lang-java=\"`connectUrl`\"\u003e`connectUrl`\u003c/span\u003e instead.",
                 "defaultInfo": {
                     "environment": [
                         "OP_CONNECT_HOST"
                     ]
-                }
+                },
+                "deprecationMessage": "The \"url\" field is deprecated and will be removed in a future version. Use \u003cspan pulumi-lang-nodejs=\"\"connectUrl\"\" pulumi-lang-dotnet=\"\"ConnectUrl\"\" pulumi-lang-go=\"\"connectUrl\"\" pulumi-lang-python=\"\"connect_url\"\" pulumi-lang-yaml=\"\"connectUrl\"\" pulumi-lang-java=\"\"connectUrl\"\"\u003e\"connectUrl\"\u003c/span\u003e instead."
             }
+        },
+        "methods": {
+            "terraformConfig": "pulumi:providers:onepassword/terraformConfig"
         }
     },
     "resources": {
         "onepassword:index/item:Item": {
-            "description": "A 1Password Item.\n\n## Example Usage\n\n\u003c!--Start PulumiCodeChooser --\u003e\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as onepassword from \"@1password/pulumi-onepassword\";\n\nconst example = new onepassword.Item(\"example\", {\n    category: \"login\",\n    passwordRecipe: {\n        length: 40,\n        symbols: false,\n    },\n    sections: [{\n        fields: [{\n            label: \"Example field\",\n            type: \"DATE\",\n            value: \"2024-01-31\",\n        }],\n        label: \"Example section\",\n    }],\n    title: \"Example Item Title\",\n    vault: \"your-vault-id\",\n});\n```\n```python\nimport pulumi\nimport pulumi_onepassword as onepassword\n\nexample = onepassword.Item(\"example\",\n    category=\"login\",\n    password_recipe={\n        \"length\": 40,\n        \"symbols\": False,\n    },\n    sections=[{\n        \"fields\": [{\n            \"label\": \"Example field\",\n            \"type\": \"DATE\",\n            \"value\": \"2024-01-31\",\n        }],\n        \"label\": \"Example section\",\n    }],\n    title=\"Example Item Title\",\n    vault=\"your-vault-id\")\n```\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing Onepassword = Pulumi.Onepassword;\n\nreturn await Deployment.RunAsync(() =\u003e \n{\n    var example = new Onepassword.Item(\"example\", new()\n    {\n        Category = \"login\",\n        PasswordRecipe = new Onepassword.Inputs.ItemPasswordRecipeArgs\n        {\n            Length = 40,\n            Symbols = false,\n        },\n        Sections = new[]\n        {\n            new Onepassword.Inputs.ItemSectionArgs\n            {\n                Fields = new[]\n                {\n                    new Onepassword.Inputs.ItemSectionFieldArgs\n                    {\n                        Label = \"Example field\",\n                        Type = \"DATE\",\n                        Value = \"2024-01-31\",\n                    },\n                },\n                Label = \"Example section\",\n            },\n        },\n        Title = \"Example Item Title\",\n        Vault = \"your-vault-id\",\n    });\n\n});\n```\n```go\npackage main\n\nimport (\n\t\"github.com/1Password/pulumi-onepassword/sdk/go/onepassword\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\t_, err := onepassword.NewItem(ctx, \"example\", \u0026onepassword.ItemArgs{\n\t\t\tCategory: pulumi.String(\"login\"),\n\t\t\tPasswordRecipe: \u0026onepassword.ItemPasswordRecipeArgs{\n\t\t\t\tLength:  pulumi.Int(40),\n\t\t\t\tSymbols: pulumi.Bool(false),\n\t\t\t},\n\t\t\tSections: onepassword.ItemSectionArray{\n\t\t\t\t\u0026onepassword.ItemSectionArgs{\n\t\t\t\t\tFields: onepassword.ItemSectionFieldArray{\n\t\t\t\t\t\t\u0026onepassword.ItemSectionFieldArgs{\n\t\t\t\t\t\t\tLabel: pulumi.String(\"Example field\"),\n\t\t\t\t\t\t\tType:  pulumi.String(\"DATE\"),\n\t\t\t\t\t\t\tValue: pulumi.String(\"2024-01-31\"),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t\tLabel: pulumi.String(\"Example section\"),\n\t\t\t\t},\n\t\t\t},\n\t\t\tTitle: pulumi.String(\"Example Item Title\"),\n\t\t\tVault: pulumi.String(\"your-vault-id\"),\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn nil\n\t})\n}\n```\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.onepassword.Item;\nimport com.pulumi.onepassword.ItemArgs;\nimport com.pulumi.onepassword.inputs.ItemPasswordRecipeArgs;\nimport com.pulumi.onepassword.inputs.ItemSectionArgs;\nimport java.util.List;\nimport java.util.ArrayList;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        var example = new Item(\"example\", ItemArgs.builder()\n            .category(\"login\")\n            .passwordRecipe(ItemPasswordRecipeArgs.builder()\n                .length(40)\n                .symbols(false)\n                .build())\n            .sections(ItemSectionArgs.builder()\n                .fields(ItemSectionFieldArgs.builder()\n                    .label(\"Example field\")\n                    .type(\"DATE\")\n                    .value(\"2024-01-31\")\n                    .build())\n                .label(\"Example section\")\n                .build())\n            .title(\"Example Item Title\")\n            .vault(\"your-vault-id\")\n            .build());\n\n    }\n}\n```\n```yaml\nresources:\n  example:\n    type: onepassword:Item\n    properties:\n      category: login\n      passwordRecipe:\n        length: 40\n        symbols: false\n      sections:\n        - fields:\n            - label: Example field\n              type: DATE\n              value: 2024-01-31\n          label: Example section\n      title: Example Item Title\n      vault: your-vault-id\n```\n\u003c!--End PulumiCodeChooser --\u003e\n\n## Import\n\nimport an existing 1Password item\n\n```sh\n$ pulumi import onepassword:index/item:Item myitem vaults/\u003cvault uuid\u003e/items/\u003citem uuid\u003e\n```\n\n",
+            "description": "A 1Password Item.\n\n## Example Usage\n\n\u003c!--Start PulumiCodeChooser --\u003e\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as onepassword from \"@1password/pulumi-onepassword\";\n\n// Example using section_map (map-based sections for direct field access)\nconst exampleWithMap = new onepassword.Item(\"example_with_map\", {\n    vault: \"your-vault-id\",\n    title: \"Example Item with Section Map\",\n    category: \"login\",\n    sectionMap: {\n        credentials: {\n            fieldMap: {\n                api_key: {\n                    type: \"CONCEALED\",\n                    value: \"my-secret-api-key\",\n                },\n                api_endpoint: {\n                    type: \"URL\",\n                    value: \"https://api.example.com\",\n                },\n            },\n        },\n        metadata: {\n            fieldMap: {\n                environment: {\n                    type: \"STRING\",\n                    value: \"production\",\n                },\n                created_by: {\n                    type: \"STRING\",\n                    value: \"terraform\",\n                },\n            },\n        },\n    },\n});\n// Example using section (list-based sections)\nconst exampleWithList = new onepassword.Item(\"example_with_list\", {\n    vault: \"your-vault-id\",\n    title: \"Example Item with Section List\",\n    category: \"login\",\n    passwordRecipe: {\n        length: 40,\n        symbols: false,\n    },\n    sections: [{\n        label: \"Example section\",\n        fields: [{\n            label: \"Example field\",\n            type: \"DATE\",\n            value: \"2024-01-31\",\n        }],\n    }],\n});\n```\n```python\nimport pulumi\nimport pulumi_onepassword as onepassword\n\n# Example using section_map (map-based sections for direct field access)\nexample_with_map = onepassword.Item(\"example_with_map\",\n    vault=\"your-vault-id\",\n    title=\"Example Item with Section Map\",\n    category=\"login\",\n    section_map={\n        \"credentials\": {\n            \"field_map\": {\n                \"api_key\": {\n                    \"type\": \"CONCEALED\",\n                    \"value\": \"my-secret-api-key\",\n                },\n                \"api_endpoint\": {\n                    \"type\": \"URL\",\n                    \"value\": \"https://api.example.com\",\n                },\n            },\n        },\n        \"metadata\": {\n            \"field_map\": {\n                \"environment\": {\n                    \"type\": \"STRING\",\n                    \"value\": \"production\",\n                },\n                \"created_by\": {\n                    \"type\": \"STRING\",\n                    \"value\": \"terraform\",\n                },\n            },\n        },\n    })\n# Example using section (list-based sections)\nexample_with_list = onepassword.Item(\"example_with_list\",\n    vault=\"your-vault-id\",\n    title=\"Example Item with Section List\",\n    category=\"login\",\n    password_recipe={\n        \"length\": 40,\n        \"symbols\": False,\n    },\n    sections=[{\n        \"label\": \"Example section\",\n        \"fields\": [{\n            \"label\": \"Example field\",\n            \"type\": \"DATE\",\n            \"value\": \"2024-01-31\",\n        }],\n    }])\n```\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing Onepassword = Pulumi.Onepassword;\n\nreturn await Deployment.RunAsync(() =\u003e \n{\n    // Example using section_map (map-based sections for direct field access)\n    var exampleWithMap = new Onepassword.Item(\"example_with_map\", new()\n    {\n        Vault = \"your-vault-id\",\n        Title = \"Example Item with Section Map\",\n        Category = \"login\",\n        SectionMap = \n        {\n            { \"credentials\", new Onepassword.Inputs.ItemSectionMapArgs\n            {\n                FieldMap = \n                {\n                    { \"api_key\", new Onepassword.Inputs.ItemSectionMapFieldMapArgs\n                    {\n                        Type = \"CONCEALED\",\n                        Value = \"my-secret-api-key\",\n                    } },\n                    { \"api_endpoint\", new Onepassword.Inputs.ItemSectionMapFieldMapArgs\n                    {\n                        Type = \"URL\",\n                        Value = \"https://api.example.com\",\n                    } },\n                },\n            } },\n            { \"metadata\", new Onepassword.Inputs.ItemSectionMapArgs\n            {\n                FieldMap = \n                {\n                    { \"environment\", new Onepassword.Inputs.ItemSectionMapFieldMapArgs\n                    {\n                        Type = \"STRING\",\n                        Value = \"production\",\n                    } },\n                    { \"created_by\", new Onepassword.Inputs.ItemSectionMapFieldMapArgs\n                    {\n                        Type = \"STRING\",\n                        Value = \"terraform\",\n                    } },\n                },\n            } },\n        },\n    });\n\n    // Example using section (list-based sections)\n    var exampleWithList = new Onepassword.Item(\"example_with_list\", new()\n    {\n        Vault = \"your-vault-id\",\n        Title = \"Example Item with Section List\",\n        Category = \"login\",\n        PasswordRecipe = new Onepassword.Inputs.ItemPasswordRecipeArgs\n        {\n            Length = 40,\n            Symbols = false,\n        },\n        Sections = new[]\n        {\n            new Onepassword.Inputs.ItemSectionArgs\n            {\n                Label = \"Example section\",\n                Fields = new[]\n                {\n                    new Onepassword.Inputs.ItemSectionFieldArgs\n                    {\n                        Label = \"Example field\",\n                        Type = \"DATE\",\n                        Value = \"2024-01-31\",\n                    },\n                },\n            },\n        },\n    });\n\n});\n```\n```go\npackage main\n\nimport (\n\t\"github.com/1Password/pulumi-onepassword/sdk/go/onepassword\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\t// Example using section_map (map-based sections for direct field access)\n\t\t_, err := onepassword.NewItem(ctx, \"example_with_map\", \u0026onepassword.ItemArgs{\n\t\t\tVault:    pulumi.String(\"your-vault-id\"),\n\t\t\tTitle:    pulumi.String(\"Example Item with Section Map\"),\n\t\t\tCategory: pulumi.String(\"login\"),\n\t\t\tSectionMap: onepassword.ItemSectionMapMap{\n\t\t\t\t\"credentials\": \u0026onepassword.ItemSectionMapArgs{\n\t\t\t\t\tFieldMap: onepassword.ItemSectionMapFieldMapMap{\n\t\t\t\t\t\t\"api_key\": \u0026onepassword.ItemSectionMapFieldMapArgs{\n\t\t\t\t\t\t\tType:  pulumi.String(\"CONCEALED\"),\n\t\t\t\t\t\t\tValue: pulumi.String(\"my-secret-api-key\"),\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"api_endpoint\": \u0026onepassword.ItemSectionMapFieldMapArgs{\n\t\t\t\t\t\t\tType:  pulumi.String(\"URL\"),\n\t\t\t\t\t\t\tValue: pulumi.String(\"https://api.example.com\"),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\t\"metadata\": \u0026onepassword.ItemSectionMapArgs{\n\t\t\t\t\tFieldMap: onepassword.ItemSectionMapFieldMapMap{\n\t\t\t\t\t\t\"environment\": \u0026onepassword.ItemSectionMapFieldMapArgs{\n\t\t\t\t\t\t\tType:  pulumi.String(\"STRING\"),\n\t\t\t\t\t\t\tValue: pulumi.String(\"production\"),\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"created_by\": \u0026onepassword.ItemSectionMapFieldMapArgs{\n\t\t\t\t\t\t\tType:  pulumi.String(\"STRING\"),\n\t\t\t\t\t\t\tValue: pulumi.String(\"terraform\"),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\t// Example using section (list-based sections)\n\t\t_, err = onepassword.NewItem(ctx, \"example_with_list\", \u0026onepassword.ItemArgs{\n\t\t\tVault:    pulumi.String(\"your-vault-id\"),\n\t\t\tTitle:    pulumi.String(\"Example Item with Section List\"),\n\t\t\tCategory: pulumi.String(\"login\"),\n\t\t\tPasswordRecipe: \u0026onepassword.ItemPasswordRecipeArgs{\n\t\t\t\tLength:  pulumi.Int(40),\n\t\t\t\tSymbols: pulumi.Bool(false),\n\t\t\t},\n\t\t\tSections: onepassword.ItemSectionArray{\n\t\t\t\t\u0026onepassword.ItemSectionArgs{\n\t\t\t\t\tLabel: pulumi.String(\"Example section\"),\n\t\t\t\t\tFields: onepassword.ItemSectionFieldArray{\n\t\t\t\t\t\t\u0026onepassword.ItemSectionFieldArgs{\n\t\t\t\t\t\t\tLabel: pulumi.String(\"Example field\"),\n\t\t\t\t\t\t\tType:  pulumi.String(\"DATE\"),\n\t\t\t\t\t\t\tValue: pulumi.String(\"2024-01-31\"),\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\t\t})\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn nil\n\t})\n}\n```\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.onepassword.Item;\nimport com.pulumi.onepassword.ItemArgs;\nimport com.pulumi.onepassword.inputs.ItemPasswordRecipeArgs;\nimport com.pulumi.onepassword.inputs.ItemSectionArgs;\nimport java.util.List;\nimport java.util.ArrayList;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        // Example using section_map (map-based sections for direct field access)\n        var exampleWithMap = new Item(\"exampleWithMap\", ItemArgs.builder()\n            .vault(\"your-vault-id\")\n            .title(\"Example Item with Section Map\")\n            .category(\"login\")\n            .sectionMap(Map.ofEntries(\n                Map.entry(\"credentials\", ItemSectionMapArgs.builder()\n                    .fieldMap(Map.ofEntries(\n                        Map.entry(\"api_key\", ItemSectionMapFieldMapArgs.builder()\n                            .type(\"CONCEALED\")\n                            .value(\"my-secret-api-key\")\n                            .build()),\n                        Map.entry(\"api_endpoint\", ItemSectionMapFieldMapArgs.builder()\n                            .type(\"URL\")\n                            .value(\"https://api.example.com\")\n                            .build())\n                    ))\n                    .build()),\n                Map.entry(\"metadata\", ItemSectionMapArgs.builder()\n                    .fieldMap(Map.ofEntries(\n                        Map.entry(\"environment\", ItemSectionMapFieldMapArgs.builder()\n                            .type(\"STRING\")\n                            .value(\"production\")\n                            .build()),\n                        Map.entry(\"created_by\", ItemSectionMapFieldMapArgs.builder()\n                            .type(\"STRING\")\n                            .value(\"terraform\")\n                            .build())\n                    ))\n                    .build())\n            ))\n            .build());\n\n        // Example using section (list-based sections)\n        var exampleWithList = new Item(\"exampleWithList\", ItemArgs.builder()\n            .vault(\"your-vault-id\")\n            .title(\"Example Item with Section List\")\n            .category(\"login\")\n            .passwordRecipe(ItemPasswordRecipeArgs.builder()\n                .length(40)\n                .symbols(false)\n                .build())\n            .sections(ItemSectionArgs.builder()\n                .label(\"Example section\")\n                .fields(ItemSectionFieldArgs.builder()\n                    .label(\"Example field\")\n                    .type(\"DATE\")\n                    .value(\"2024-01-31\")\n                    .build())\n                .build())\n            .build());\n\n    }\n}\n```\n```yaml\nresources:\n  # Example using section_map (map-based sections for direct field access)\n  exampleWithMap:\n    type: onepassword:Item\n    name: example_with_map\n    properties:\n      vault: your-vault-id\n      title: Example Item with Section Map\n      category: login\n      sectionMap:\n        credentials:\n          fieldMap:\n            api_key:\n              type: CONCEALED\n              value: my-secret-api-key\n            api_endpoint:\n              type: URL\n              value: https://api.example.com\n        metadata:\n          fieldMap:\n            environment:\n              type: STRING\n              value: production\n            created_by:\n              type: STRING\n              value: terraform\n  # Example using section (list-based sections)\n  exampleWithList:\n    type: onepassword:Item\n    name: example_with_list\n    properties:\n      vault: your-vault-id\n      title: Example Item with Section List\n      category: login\n      passwordRecipe:\n        length: 40\n        symbols: false\n      sections:\n        - label: Example section\n          fields:\n            - label: Example field\n              type: DATE\n              value: 2024-01-31\n```\n\u003c!--End PulumiCodeChooser --\u003e\n\n## Import\n\nThe `pulumi import` command can be used, for example:\n\n```sh\n# import an existing 1Password item\nterraform import onepassword_item.myitem vaults/\u003cvault uuid\u003e/items/\u003citem uuid\u003e\n```\n\n",
             "properties": {
                 "category": {
                     "type": "string",
-                    "description": "The category of the item. One of [\"login\" \"password\" \"database\" \"secure_note\"]\n"
+                    "description": "The category of the item. One of [\"login\" \"password\" \"database\" \u003cspan pulumi-lang-nodejs=\"\"secureNote\"\" pulumi-lang-dotnet=\"\"SecureNote\"\" pulumi-lang-go=\"\"secureNote\"\" pulumi-lang-python=\"\"secure_note\"\" pulumi-lang-yaml=\"\"secureNote\"\" pulumi-lang-java=\"\"secureNote\"\"\u003e\"secureNote\"\u003c/span\u003e]"
                 },
                 "database": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The name of the database.\n"
+                    "description": "(Only applies to the database category) The name of the database."
                 },
                 "hostname": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The address where the database can be found\n"
+                    "description": "(Only applies to the database category) The address where the database can be found"
                 },
                 "noteValue": {
                     "type": "string",
-                    "description": "Secure Note value.\n",
+                    "description": "Secure Note value.",
                     "secret": true
+                },
+                "noteValueWo": {
+                    "type": "string",
+                    "description": "**NOTE:** This field is write-only and its value will not be updated in state as part of read operations.\nA write-only secure note value for this item. This value is not stored in the state and is intended for use with ephemeral values. **Note**: Write-only arguments require Terraform 1.11 or later.",
+                    "secret": true
+                },
+                "noteValueWoVersion": {
+                    "type": "integer",
+                    "description": "An integer that must be incremented to trigger an update to the 'note_value_wo' field."
                 },
                 "password": {
                     "type": "string",
-                    "description": "Password for this item.\n",
+                    "description": "Password for this item.",
                     "secret": true
                 },
                 "passwordRecipe": {
                     "$ref": "#/types/onepassword:index/ItemPasswordRecipe:ItemPasswordRecipe",
-                    "description": "The recipe used to generate a new value for a password.\n"
+                    "description": "The recipe used to generate a new value for a password."
+                },
+                "passwordWo": {
+                    "type": "string",
+                    "description": "**NOTE:** This field is write-only and its value will not be updated in state as part of read operations.\nA write-only password for this item. This value is not stored in the state and is intended for use with ephemeral values. **Note**: Write-only arguments require Terraform 1.11 or later.",
+                    "secret": true
+                },
+                "passwordWoVersion": {
+                    "type": "integer",
+                    "description": "An integer that must be incremented to trigger an update to the 'password_wo' field."
                 },
                 "port": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The port the database is listening on.\n"
+                    "description": "(Only applies to the database category) The port the database is listening on."
+                },
+                "sectionMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/types/onepassword:index/ItemSectionMap:ItemSectionMap"
+                    },
+                    "description": "A map of custom sections in an item, keyed by section label. This allows direct lookup of sections and their fields by label. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both."
                 },
                 "sections": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/onepassword:index/ItemSection:ItemSection"
                     },
-                    "description": "A list of custom sections in an item\n"
+                    "description": "A list of custom sections in an item. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both."
                 },
                 "tags": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "An array of strings of the tags assigned to the item.\n"
+                    "description": "An array of strings of the tags assigned to the item."
                 },
                 "title": {
                     "type": "string",
-                    "description": "The title of the item.\n"
+                    "description": "The title of the item."
                 },
                 "type": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The type of database. One of [\"db2\" \"filemaker\" \"msaccess\" \"mssql\" \"mysql\" \"oracle\" \"postgresql\" \"sqlite\" \"other\"]\n"
+                    "description": "(Only applies to the database category) The type of database. One of [\"db2\" \"filemaker\" \"msaccess\" \"mssql\" \"mysql\" \"oracle\" \"postgresql\" \"sqlite\" \"other\"]"
                 },
                 "url": {
                     "type": "string",
-                    "description": "The primary URL for the item.\n"
+                    "description": "The primary URL for the item."
                 },
                 "username": {
                     "type": "string",
-                    "description": "Username for this item.\n"
+                    "description": "Username for this item."
                 },
                 "uuid": {
                     "type": "string",
-                    "description": "The UUID of the item. Item identifiers are unique within a specific vault.\n"
+                    "description": "The UUID of the item. Item identifiers are unique within a specific vault."
                 },
                 "vault": {
                     "type": "string",
@@ -542,63 +761,88 @@
             "inputProperties": {
                 "category": {
                     "type": "string",
-                    "description": "The category of the item. One of [\"login\" \"password\" \"database\" \"secure_note\"]\n"
+                    "description": "The category of the item. One of [\"login\" \"password\" \"database\" \u003cspan pulumi-lang-nodejs=\"\"secureNote\"\" pulumi-lang-dotnet=\"\"SecureNote\"\" pulumi-lang-go=\"\"secureNote\"\" pulumi-lang-python=\"\"secure_note\"\" pulumi-lang-yaml=\"\"secureNote\"\" pulumi-lang-java=\"\"secureNote\"\"\u003e\"secureNote\"\u003c/span\u003e]"
                 },
                 "database": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The name of the database.\n"
+                    "description": "(Only applies to the database category) The name of the database."
                 },
                 "hostname": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The address where the database can be found\n"
+                    "description": "(Only applies to the database category) The address where the database can be found"
                 },
                 "noteValue": {
                     "type": "string",
-                    "description": "Secure Note value.\n",
+                    "description": "Secure Note value.",
                     "secret": true
+                },
+                "noteValueWo": {
+                    "type": "string",
+                    "description": "**NOTE:** This field is write-only and its value will not be updated in state as part of read operations.\nA write-only secure note value for this item. This value is not stored in the state and is intended for use with ephemeral values. **Note**: Write-only arguments require Terraform 1.11 or later.",
+                    "secret": true
+                },
+                "noteValueWoVersion": {
+                    "type": "integer",
+                    "description": "An integer that must be incremented to trigger an update to the 'note_value_wo' field."
                 },
                 "password": {
                     "type": "string",
-                    "description": "Password for this item.\n",
+                    "description": "Password for this item.",
                     "secret": true
                 },
                 "passwordRecipe": {
                     "$ref": "#/types/onepassword:index/ItemPasswordRecipe:ItemPasswordRecipe",
-                    "description": "The recipe used to generate a new value for a password.\n"
+                    "description": "The recipe used to generate a new value for a password."
+                },
+                "passwordWo": {
+                    "type": "string",
+                    "description": "**NOTE:** This field is write-only and its value will not be updated in state as part of read operations.\nA write-only password for this item. This value is not stored in the state and is intended for use with ephemeral values. **Note**: Write-only arguments require Terraform 1.11 or later.",
+                    "secret": true
+                },
+                "passwordWoVersion": {
+                    "type": "integer",
+                    "description": "An integer that must be incremented to trigger an update to the 'password_wo' field."
                 },
                 "port": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The port the database is listening on.\n"
+                    "description": "(Only applies to the database category) The port the database is listening on."
+                },
+                "sectionMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/types/onepassword:index/ItemSectionMap:ItemSectionMap"
+                    },
+                    "description": "A map of custom sections in an item, keyed by section label. This allows direct lookup of sections and their fields by label. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both."
                 },
                 "sections": {
                     "type": "array",
                     "items": {
                         "$ref": "#/types/onepassword:index/ItemSection:ItemSection"
                     },
-                    "description": "A list of custom sections in an item\n"
+                    "description": "A list of custom sections in an item. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both."
                 },
                 "tags": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "An array of strings of the tags assigned to the item.\n"
+                    "description": "An array of strings of the tags assigned to the item."
                 },
                 "title": {
                     "type": "string",
-                    "description": "The title of the item.\n"
+                    "description": "The title of the item."
                 },
                 "type": {
                     "type": "string",
-                    "description": "(Only applies to the database category) The type of database. One of [\"db2\" \"filemaker\" \"msaccess\" \"mssql\" \"mysql\" \"oracle\" \"postgresql\" \"sqlite\" \"other\"]\n"
+                    "description": "(Only applies to the database category) The type of database. One of [\"db2\" \"filemaker\" \"msaccess\" \"mssql\" \"mysql\" \"oracle\" \"postgresql\" \"sqlite\" \"other\"]"
                 },
                 "url": {
                     "type": "string",
-                    "description": "The primary URL for the item.\n"
+                    "description": "The primary URL for the item."
                 },
                 "username": {
                     "type": "string",
-                    "description": "Username for this item.\n"
+                    "description": "Username for this item."
                 },
                 "vault": {
                     "type": "string",
@@ -613,67 +857,92 @@
                 "properties": {
                     "category": {
                         "type": "string",
-                        "description": "The category of the item. One of [\"login\" \"password\" \"database\" \"secure_note\"]\n"
+                        "description": "The category of the item. One of [\"login\" \"password\" \"database\" \u003cspan pulumi-lang-nodejs=\"\"secureNote\"\" pulumi-lang-dotnet=\"\"SecureNote\"\" pulumi-lang-go=\"\"secureNote\"\" pulumi-lang-python=\"\"secure_note\"\" pulumi-lang-yaml=\"\"secureNote\"\" pulumi-lang-java=\"\"secureNote\"\"\u003e\"secureNote\"\u003c/span\u003e]"
                     },
                     "database": {
                         "type": "string",
-                        "description": "(Only applies to the database category) The name of the database.\n"
+                        "description": "(Only applies to the database category) The name of the database."
                     },
                     "hostname": {
                         "type": "string",
-                        "description": "(Only applies to the database category) The address where the database can be found\n"
+                        "description": "(Only applies to the database category) The address where the database can be found"
                     },
                     "noteValue": {
                         "type": "string",
-                        "description": "Secure Note value.\n",
+                        "description": "Secure Note value.",
                         "secret": true
+                    },
+                    "noteValueWo": {
+                        "type": "string",
+                        "description": "**NOTE:** This field is write-only and its value will not be updated in state as part of read operations.\nA write-only secure note value for this item. This value is not stored in the state and is intended for use with ephemeral values. **Note**: Write-only arguments require Terraform 1.11 or later.",
+                        "secret": true
+                    },
+                    "noteValueWoVersion": {
+                        "type": "integer",
+                        "description": "An integer that must be incremented to trigger an update to the 'note_value_wo' field."
                     },
                     "password": {
                         "type": "string",
-                        "description": "Password for this item.\n",
+                        "description": "Password for this item.",
                         "secret": true
                     },
                     "passwordRecipe": {
                         "$ref": "#/types/onepassword:index/ItemPasswordRecipe:ItemPasswordRecipe",
-                        "description": "The recipe used to generate a new value for a password.\n"
+                        "description": "The recipe used to generate a new value for a password."
+                    },
+                    "passwordWo": {
+                        "type": "string",
+                        "description": "**NOTE:** This field is write-only and its value will not be updated in state as part of read operations.\nA write-only password for this item. This value is not stored in the state and is intended for use with ephemeral values. **Note**: Write-only arguments require Terraform 1.11 or later.",
+                        "secret": true
+                    },
+                    "passwordWoVersion": {
+                        "type": "integer",
+                        "description": "An integer that must be incremented to trigger an update to the 'password_wo' field."
                     },
                     "port": {
                         "type": "string",
-                        "description": "(Only applies to the database category) The port the database is listening on.\n"
+                        "description": "(Only applies to the database category) The port the database is listening on."
+                    },
+                    "sectionMap": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/types/onepassword:index/ItemSectionMap:ItemSectionMap"
+                        },
+                        "description": "A map of custom sections in an item, keyed by section label. This allows direct lookup of sections and their fields by label. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both."
                     },
                     "sections": {
                         "type": "array",
                         "items": {
                             "$ref": "#/types/onepassword:index/ItemSection:ItemSection"
                         },
-                        "description": "A list of custom sections in an item\n"
+                        "description": "A list of custom sections in an item. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both."
                     },
                     "tags": {
                         "type": "array",
                         "items": {
                             "type": "string"
                         },
-                        "description": "An array of strings of the tags assigned to the item.\n"
+                        "description": "An array of strings of the tags assigned to the item."
                     },
                     "title": {
                         "type": "string",
-                        "description": "The title of the item.\n"
+                        "description": "The title of the item."
                     },
                     "type": {
                         "type": "string",
-                        "description": "(Only applies to the database category) The type of database. One of [\"db2\" \"filemaker\" \"msaccess\" \"mssql\" \"mysql\" \"oracle\" \"postgresql\" \"sqlite\" \"other\"]\n"
+                        "description": "(Only applies to the database category) The type of database. One of [\"db2\" \"filemaker\" \"msaccess\" \"mssql\" \"mysql\" \"oracle\" \"postgresql\" \"sqlite\" \"other\"]"
                     },
                     "url": {
                         "type": "string",
-                        "description": "The primary URL for the item.\n"
+                        "description": "The primary URL for the item."
                     },
                     "username": {
                         "type": "string",
-                        "description": "Username for this item.\n"
+                        "description": "Username for this item."
                     },
                     "uuid": {
                         "type": "string",
-                        "description": "The UUID of the item. Item identifiers are unique within a specific vault.\n"
+                        "description": "The UUID of the item. Item identifiers are unique within a specific vault."
                     },
                     "vault": {
                         "type": "string",
@@ -685,8 +954,65 @@
         }
     },
     "functions": {
+        "onepassword:index/getEnvironment:getEnvironment": {
+            "description": "Use this data source to read environment variables from a [1Password Environment](https://developer.1password.com/docs/environments/). 1Password Environments allow you to organize and manage project secrets as environment variables. This data source is only supported when using **service account** or **desktop app** authentication; it is not available with 1Password Connect.\n\n## Example Usage\n\n\u003c!--Start PulumiCodeChooser --\u003e\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as onepassword from \"@1password/pulumi-onepassword\";\n\n// Read environment variables from a 1Password Environment.\n// Requires service account or desktop app authentication (not 1Password Connect).\nconst example = onepassword.getEnvironment({\n    environmentId: \"your-environment-id\",\n});\nexport const envVariables = example.then(example =\u003e example.variables);\n```\n```python\nimport pulumi\nimport pulumi_onepassword as onepassword\n\n# Read environment variables from a 1Password Environment.\n# Requires service account or desktop app authentication (not 1Password Connect).\nexample = onepassword.get_environment(environment_id=\"your-environment-id\")\npulumi.export(\"envVariables\", example.variables)\n```\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing Onepassword = Pulumi.Onepassword;\n\nreturn await Deployment.RunAsync(() =\u003e \n{\n    // Read environment variables from a 1Password Environment.\n    // Requires service account or desktop app authentication (not 1Password Connect).\n    var example = Onepassword.GetEnvironment.Invoke(new()\n    {\n        EnvironmentId = \"your-environment-id\",\n    });\n\n    return new Dictionary\u003cstring, object?\u003e\n    {\n        [\"envVariables\"] = example.Apply(getEnvironmentResult =\u003e getEnvironmentResult.Variables),\n    };\n});\n```\n```go\npackage main\n\nimport (\n\t\"github.com/1Password/pulumi-onepassword/sdk/go/onepassword\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\t// Read environment variables from a 1Password Environment.\n\t\t// Requires service account or desktop app authentication (not 1Password Connect).\n\t\texample, err := onepassword.GetEnvironment(ctx, \u0026onepassword.GetEnvironmentArgs{\n\t\t\tEnvironmentId: \"your-environment-id\",\n\t\t}, nil)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\tctx.Export(\"envVariables\", example.Variables)\n\t\treturn nil\n\t})\n}\n```\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.onepassword.OnepasswordFunctions;\nimport com.pulumi.onepassword.inputs.GetEnvironmentArgs;\nimport java.util.List;\nimport java.util.ArrayList;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        // Read environment variables from a 1Password Environment.\n        // Requires service account or desktop app authentication (not 1Password Connect).\n        final var example = OnepasswordFunctions.getEnvironment(GetEnvironmentArgs.builder()\n            .environmentId(\"your-environment-id\")\n            .build());\n\n        ctx.export(\"envVariables\", example.variables());\n    }\n}\n```\n```yaml\nvariables:\n  # Read environment variables from a 1Password Environment.\n  # Requires service account or desktop app authentication (not 1Password Connect).\n  example:\n    fn::invoke:\n      function: onepassword:getEnvironment\n      arguments:\n        environmentId: your-environment-id\noutputs:\n  # Use the variables map in a resource or output\n  envVariables: ${example.variables}\n```\n\u003c!--End PulumiCodeChooser --\u003e\n",
+            "inputs": {
+                "description": "A collection of arguments for invoking getEnvironment.\n",
+                "properties": {
+                    "environmentId": {
+                        "type": "string",
+                        "description": "The unique identifier of the 1Password Environment. You can find this in the 1Password desktop app under Developer \u003e View Environments \u003e Manage environment \u003e Copy environment ID.\n"
+                    },
+                    "metadatas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/types/onepassword:index/getEnvironmentMetadata:getEnvironmentMetadata"
+                        },
+                        "description": "Metadata for each environment variable (name, value, and masked flag). Use this when you need the full structure; use \u003cspan pulumi-lang-nodejs=\"`variables`\" pulumi-lang-dotnet=\"`Variables`\" pulumi-lang-go=\"`variables`\" pulumi-lang-python=\"`variables`\" pulumi-lang-yaml=\"`variables`\" pulumi-lang-java=\"`variables`\"\u003e`variables`\u003c/span\u003e for a simple name-to-value map.\n"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "environmentId"
+                ]
+            },
+            "outputs": {
+                "description": "A collection of values returned by getEnvironment.\n",
+                "properties": {
+                    "environmentId": {
+                        "description": "The unique identifier of the 1Password Environment. You can find this in the 1Password desktop app under Developer \u003e View Environments \u003e Manage environment \u003e Copy environment ID.\n",
+                        "type": "string"
+                    },
+                    "id": {
+                        "description": "The Terraform resource identifier for this environment in the format `environments/\u003cenvironment_id\u003e`.\n",
+                        "type": "string"
+                    },
+                    "metadatas": {
+                        "description": "Metadata for each environment variable (name, value, and masked flag). Use this when you need the full structure; use \u003cspan pulumi-lang-nodejs=\"`variables`\" pulumi-lang-dotnet=\"`Variables`\" pulumi-lang-go=\"`variables`\" pulumi-lang-python=\"`variables`\" pulumi-lang-yaml=\"`variables`\" pulumi-lang-java=\"`variables`\"\u003e`variables`\u003c/span\u003e for a simple name-to-value map.\n",
+                        "items": {
+                            "$ref": "#/types/onepassword:index/getEnvironmentMetadata:getEnvironmentMetadata"
+                        },
+                        "type": "array"
+                    },
+                    "variables": {
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "description": "A map of environment variable names to their values. Use this for passing secrets into Terraform resources or for use in \u003cspan pulumi-lang-nodejs=\"`environment`\" pulumi-lang-dotnet=\"`Environment`\" pulumi-lang-go=\"`environment`\" pulumi-lang-python=\"`environment`\" pulumi-lang-yaml=\"`environment`\" pulumi-lang-java=\"`environment`\"\u003e`environment`\u003c/span\u003e blocks.\n",
+                        "secret": true,
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "environmentId",
+                    "id",
+                    "variables"
+                ],
+                "type": "object"
+            }
+        },
         "onepassword:index/getItem:getItem": {
-            "description": "Use this data source to get details of an item by its vault uuid and either the title or the uuid of the item.\n\n## Example Usage\n\n\u003c!--Start PulumiCodeChooser --\u003e\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as onepassword from \"@1Password/pulumi-onepassword\";\n\nconst example = onepassword.getItem({\n    title: \"your-item-title\",\n    vault: \"your-vault-id\",\n});\n```\n```python\nimport pulumi\nimport pulumi_onepassword as onepassword\n\nexample = onepassword.get_item(title=\"your-item-title\",\n    vault=\"your-vault-id\")\n```\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing Onepassword = Pulumi.Onepassword;\n\nreturn await Deployment.RunAsync(() =\u003e \n{\n    var example = Onepassword.GetItem.Invoke(new()\n    {\n        Title = \"your-item-title\",\n        Vault = \"your-vault-id\",\n    });\n\n});\n```\n```go\npackage main\n\nimport (\n\t\"github.com/1Password/pulumi-onepassword/sdk/go/onepassword\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\t_, err := onepassword.LookupItem(ctx, \u0026onepassword.LookupItemArgs{\n\t\t\tTitle: pulumi.StringRef(\"your-item-title\"),\n\t\t\tVault: \"your-vault-id\",\n\t\t}, nil)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn nil\n\t})\n}\n```\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.onepassword.OnepasswordFunctions;\nimport com.pulumi.onepassword.inputs.GetItemArgs;\nimport java.util.List;\nimport java.util.ArrayList;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var example = OnepasswordFunctions.getItem(GetItemArgs.builder()\n            .title(\"your-item-title\")\n            .vault(\"your-vault-id\")\n            .build());\n\n    }\n}\n```\n```yaml\nvariables:\n  example:\n    fn::invoke:\n      Function: onepassword:getItem\n      Arguments:\n        title: your-item-title\n        vault: your-vault-id\n```\n\u003c!--End PulumiCodeChooser --\u003e\n",
+            "description": "Use this to get details of an item by its vault uuid and either the title or the uuid of the item.\n\n## Example Usage\n\n\u003c!--Start PulumiCodeChooser --\u003e\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as onepassword from \"@1password/pulumi-onepassword\";\n\nconst example = onepassword.getItem({\n    vault: \"your-vault-id\",\n    title: \"your-item-title\",\n});\n```\n```python\nimport pulumi\nimport pulumi_onepassword as onepassword\n\nexample = onepassword.get_item(vault=\"your-vault-id\",\n    title=\"your-item-title\")\n```\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing Onepassword = Pulumi.Onepassword;\n\nreturn await Deployment.RunAsync(() =\u003e \n{\n    var example = Onepassword.GetItem.Invoke(new()\n    {\n        Vault = \"your-vault-id\",\n        Title = \"your-item-title\",\n    });\n\n});\n```\n```go\npackage main\n\nimport (\n\t\"github.com/1Password/pulumi-onepassword/sdk/go/onepassword\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\t_, err := onepassword.LookupItem(ctx, \u0026onepassword.LookupItemArgs{\n\t\t\tVault: \"your-vault-id\",\n\t\t\tTitle: pulumi.StringRef(\"your-item-title\"),\n\t\t}, nil)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn nil\n\t})\n}\n```\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.onepassword.OnepasswordFunctions;\nimport com.pulumi.onepassword.inputs.GetItemArgs;\nimport java.util.List;\nimport java.util.ArrayList;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var example = OnepasswordFunctions.getItem(GetItemArgs.builder()\n            .vault(\"your-vault-id\")\n            .title(\"your-item-title\")\n            .build());\n\n    }\n}\n```\n```yaml\nvariables:\n  example:\n    fn::invoke:\n      function: onepassword:getItem\n      arguments:\n        vault: your-vault-id\n        title: your-item-title\n```\n\u003c!--End PulumiCodeChooser --\u003e\n",
             "inputs": {
                 "description": "A collection of arguments for invoking getItem.\n",
                 "properties": {
@@ -695,19 +1021,26 @@
                         "items": {
                             "$ref": "#/types/onepassword:index/getItemFile:getItemFile"
                         },
-                        "description": "A list of files attached to the item.\n"
+                        "description": "A list of files attached to the document item.\n"
                     },
                     "noteValue": {
                         "type": "string",
                         "description": "Secure Note value.\n",
                         "secret": true
                     },
+                    "sectionMap": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/types/onepassword:index/getItemSectionMap:getItemSectionMap"
+                        },
+                        "description": "A map of custom sections in an item, keyed by section label. This allows direct lookup of sections and their fields by label. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both.\n"
+                    },
                     "sections": {
                         "type": "array",
                         "items": {
                             "$ref": "#/types/onepassword:index/getItemSection:getItemSection"
                         },
-                        "description": "A list of custom sections in an item\n"
+                        "description": "A list of custom sections in an item. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both.\n"
                     },
                     "title": {
                         "type": "string",
@@ -731,118 +1064,143 @@
                 "description": "A collection of values returned by getItem.\n",
                 "properties": {
                     "category": {
-                        "type": "string",
-                        "description": "The category of the item. One of [\"login\" \"password\" \"database\" \"secure*note\" \"document\" \"ssh*key\"]\n"
+                        "description": "The category of the item. One of [\"login\" \"password\" \"database\" \"secure*note\" \"document\" \"ssh*key\" \u003cspan pulumi-lang-nodejs=\"\"apiCredential\"\" pulumi-lang-dotnet=\"\"ApiCredential\"\" pulumi-lang-go=\"\"apiCredential\"\" pulumi-lang-python=\"\"api_credential\"\" pulumi-lang-yaml=\"\"apiCredential\"\" pulumi-lang-java=\"\"apiCredential\"\"\u003e\"apiCredential\"\u003c/span\u003e]\n",
+                        "type": "string"
                     },
                     "credential": {
-                        "type": "string",
-                        "description": "API credential for this item.\n",
-                        "secret": true
+                        "description": "(Only applies to the API credential category) API credential for this item.\n",
+                        "secret": true,
+                        "type": "string"
                     },
                     "database": {
-                        "type": "string",
-                        "description": "(Only applies to the database category) The name of the database.\n"
+                        "description": "(Only applies to the database category) The name of the database.\n",
+                        "type": "string"
+                    },
+                    "filename": {
+                        "description": "(Only applies to the API credential category) The filename associated with the API credential.\n",
+                        "type": "string"
                     },
                     "files": {
-                        "type": "array",
+                        "description": "A list of files attached to the document item.\n",
                         "items": {
                             "$ref": "#/types/onepassword:index/getItemFile:getItemFile"
                         },
-                        "description": "A list of files attached to the item.\n"
+                        "type": "array"
                     },
                     "hostname": {
-                        "type": "string",
-                        "description": "(Only applies to the database category) The address where the database can be found\n"
+                        "description": "(Only applies to the database category) The address where the database can be found\n",
+                        "type": "string"
                     },
                     "id": {
+                        "description": "The Terraform resource identifier for this item in the format `vaults/\u003cvault_id\u003e/items/\u003citem_id\u003e`.\n",
                         "type": "string"
                     },
                     "noteValue": {
-                        "type": "string",
                         "description": "Secure Note value.\n",
-                        "secret": true
+                        "secret": true,
+                        "type": "string"
                     },
                     "password": {
-                        "type": "string",
                         "description": "Password for this item.\n",
-                        "secret": true
+                        "secret": true,
+                        "type": "string"
                     },
                     "port": {
-                        "type": "string",
-                        "description": "(Only applies to the database category) The port the database is listening on.\n"
+                        "description": "(Only applies to the database category) The port the database is listening on.\n",
+                        "type": "string"
                     },
                     "privateKey": {
-                        "type": "string",
-                        "description": "SSH Private Key for this item.\n",
-                        "secret": true
+                        "description": "SSH Private Key in PKCS#8 for this item.\n",
+                        "secret": true,
+                        "type": "string"
+                    },
+                    "privateKeyOpenssh": {
+                        "description": "SSH Private key in OpenSSH format.\n",
+                        "secret": true,
+                        "type": "string"
                     },
                     "publicKey": {
-                        "type": "string",
-                        "description": "SSH Public Key for this item.\n"
+                        "description": "SSH Public Key for this item.\n",
+                        "type": "string"
+                    },
+                    "sectionMap": {
+                        "additionalProperties": {
+                            "$ref": "#/types/onepassword:index/getItemSectionMap:getItemSectionMap"
+                        },
+                        "description": "A map of custom sections in an item, keyed by section label. This allows direct lookup of sections and their fields by label. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both.\n",
+                        "type": "object"
                     },
                     "sections": {
-                        "type": "array",
+                        "description": "A list of custom sections in an item. Cannot be used together with \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e. Use either \u003cspan pulumi-lang-nodejs=\"`section`\" pulumi-lang-dotnet=\"`Section`\" pulumi-lang-go=\"`section`\" pulumi-lang-python=\"`section`\" pulumi-lang-yaml=\"`section`\" pulumi-lang-java=\"`section`\"\u003e`section`\u003c/span\u003e (list) or \u003cspan pulumi-lang-nodejs=\"`sectionMap`\" pulumi-lang-dotnet=\"`SectionMap`\" pulumi-lang-go=\"`sectionMap`\" pulumi-lang-python=\"`section_map`\" pulumi-lang-yaml=\"`sectionMap`\" pulumi-lang-java=\"`sectionMap`\"\u003e`sectionMap`\u003c/span\u003e (map), but not both.\n",
                         "items": {
                             "$ref": "#/types/onepassword:index/getItemSection:getItemSection"
                         },
-                        "description": "A list of custom sections in an item\n"
+                        "type": "array"
                     },
                     "tags": {
-                        "type": "array",
+                        "description": "An array of strings of the tags assigned to the item.\n",
                         "items": {
                             "type": "string"
                         },
-                        "description": "An array of strings of the tags assigned to the item.\n"
+                        "type": "array"
                     },
                     "title": {
-                        "type": "string",
-                        "description": "The title of the item to retrieve. This field will be populated with the title of the item if the item it looked up by its UUID.\n"
+                        "description": "The title of the item to retrieve. This field will be populated with the title of the item if the item it looked up by its UUID.\n",
+                        "type": "string"
                     },
                     "type": {
-                        "type": "string",
-                        "description": "(Only applies to the database category) The type of database. One of [\"db2\" \"filemaker\" \"msaccess\" \"mssql\" \"mysql\" \"oracle\" \"postgresql\" \"sqlite\" \"other\"]\n"
+                        "description": "(Only applies to database and API credential categories) The type of database or API Credential.\n",
+                        "type": "string"
                     },
                     "url": {
-                        "type": "string",
-                        "description": "The primary URL for the item.\n"
+                        "description": "The primary URL for the item.\n",
+                        "type": "string"
                     },
                     "username": {
-                        "type": "string",
-                        "description": "Username for this item.\n"
+                        "description": "Username for this item.\n",
+                        "type": "string"
                     },
                     "uuid": {
-                        "type": "string",
-                        "description": "The UUID of the item to retrieve. This field will be populated with the UUID of the item if the item it looked up by its title.\n"
+                        "description": "The UUID of the item to retrieve. This field will be populated with the UUID of the item if the item it looked up by its title.\n",
+                        "type": "string"
+                    },
+                    "validFrom": {
+                        "description": "(Only applies to the API credential category) The timestamp from which the API credential is valid.\n",
+                        "type": "string"
                     },
                     "vault": {
-                        "type": "string",
-                        "description": "The UUID of the vault the item is in.\n"
+                        "description": "The UUID of the vault the item is in.\n",
+                        "type": "string"
                     }
                 },
-                "type": "object",
                 "required": [
                     "category",
                     "credential",
                     "database",
+                    "filename",
                     "hostname",
                     "id",
                     "noteValue",
                     "password",
                     "port",
                     "privateKey",
+                    "privateKeyOpenssh",
                     "publicKey",
+                    "sectionMap",
                     "tags",
                     "title",
                     "type",
                     "url",
                     "username",
                     "uuid",
+                    "validFrom",
                     "vault"
-                ]
+                ],
+                "type": "object"
             }
         },
         "onepassword:index/getVault:getVault": {
-            "description": "Use this data source to get details of a vault by either its name or uuid.\n\n## Example Usage\n\n\u003c!--Start PulumiCodeChooser --\u003e\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as onepassword from \"@1Password/pulumi-onepassword\";\n\nconst example = onepassword.getVault({\n    name: \"your-vault-name\",\n});\n```\n```python\nimport pulumi\nimport pulumi_onepassword as onepassword\n\nexample = onepassword.get_vault(name=\"your-vault-name\")\n```\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing Onepassword = Pulumi.Onepassword;\n\nreturn await Deployment.RunAsync(() =\u003e \n{\n    var example = Onepassword.GetVault.Invoke(new()\n    {\n        Name = \"your-vault-name\",\n    });\n\n});\n```\n```go\npackage main\n\nimport (\n\t\"github.com/1Password/pulumi-onepassword/sdk/go/onepassword\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\t_, err := onepassword.GetVault(ctx, \u0026onepassword.GetVaultArgs{\n\t\t\tName: pulumi.StringRef(\"your-vault-name\"),\n\t\t}, nil)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn nil\n\t})\n}\n```\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.onepassword.OnepasswordFunctions;\nimport com.pulumi.onepassword.inputs.GetVaultArgs;\nimport java.util.List;\nimport java.util.ArrayList;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var example = OnepasswordFunctions.getVault(GetVaultArgs.builder()\n            .name(\"your-vault-name\")\n            .build());\n\n    }\n}\n```\n```yaml\nvariables:\n  example:\n    fn::invoke:\n      Function: onepassword:getVault\n      Arguments:\n        name: your-vault-name\n```\n\u003c!--End PulumiCodeChooser --\u003e\n",
+            "description": "Use this data source to get details of a vault by either its name or uuid.\n\n## Example Usage\n\n\u003c!--Start PulumiCodeChooser --\u003e\n```typescript\nimport * as pulumi from \"@pulumi/pulumi\";\nimport * as onepassword from \"@1password/pulumi-onepassword\";\n\nconst example = onepassword.getVault({\n    name: \"your-vault-name\",\n});\n```\n```python\nimport pulumi\nimport pulumi_onepassword as onepassword\n\nexample = onepassword.get_vault(name=\"your-vault-name\")\n```\n```csharp\nusing System.Collections.Generic;\nusing System.Linq;\nusing Pulumi;\nusing Onepassword = Pulumi.Onepassword;\n\nreturn await Deployment.RunAsync(() =\u003e \n{\n    var example = Onepassword.GetVault.Invoke(new()\n    {\n        Name = \"your-vault-name\",\n    });\n\n});\n```\n```go\npackage main\n\nimport (\n\t\"github.com/1Password/pulumi-onepassword/sdk/go/onepassword\"\n\t\"github.com/pulumi/pulumi/sdk/v3/go/pulumi\"\n)\n\nfunc main() {\n\tpulumi.Run(func(ctx *pulumi.Context) error {\n\t\t_, err := onepassword.GetVault(ctx, \u0026onepassword.GetVaultArgs{\n\t\t\tName: pulumi.StringRef(\"your-vault-name\"),\n\t\t}, nil)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn nil\n\t})\n}\n```\n```java\npackage generated_program;\n\nimport com.pulumi.Context;\nimport com.pulumi.Pulumi;\nimport com.pulumi.core.Output;\nimport com.pulumi.onepassword.OnepasswordFunctions;\nimport com.pulumi.onepassword.inputs.GetVaultArgs;\nimport java.util.List;\nimport java.util.ArrayList;\nimport java.util.Map;\nimport java.io.File;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class App {\n    public static void main(String[] args) {\n        Pulumi.run(App::stack);\n    }\n\n    public static void stack(Context ctx) {\n        final var example = OnepasswordFunctions.getVault(GetVaultArgs.builder()\n            .name(\"your-vault-name\")\n            .build());\n\n    }\n}\n```\n```yaml\nvariables:\n  example:\n    fn::invoke:\n      function: onepassword:getVault\n      arguments:\n        name: your-vault-name\n```\n\u003c!--End PulumiCodeChooser --\u003e\n",
             "inputs": {
                 "description": "A collection of arguments for invoking getVault.\n",
                 "properties": {
@@ -861,28 +1219,58 @@
                 "description": "A collection of values returned by getVault.\n",
                 "properties": {
                     "description": {
-                        "type": "string",
-                        "description": "The description of the vault.\n"
+                        "description": "The description of the vault.\n",
+                        "type": "string"
                     },
                     "id": {
+                        "description": "The Terraform resource identifier for this item in the format `vaults/\u003cvault_id\u003e`\n",
                         "type": "string"
                     },
                     "name": {
-                        "type": "string",
-                        "description": "The name of the vault to retrieve. This field will be populated with the name of the vault if the vault it looked up by its UUID.\n"
+                        "description": "The name of the vault to retrieve. This field will be populated with the name of the vault if the vault it looked up by its UUID.\n",
+                        "type": "string"
                     },
                     "uuid": {
-                        "type": "string",
-                        "description": "The UUID of the vault to retrieve. This field will be populated with the UUID of the vault if the vault it looked up by its name.\n"
+                        "description": "The UUID of the vault to retrieve. This field will be populated with the UUID of the vault if the vault it looked up by its name.\n",
+                        "type": "string"
                     }
                 },
-                "type": "object",
                 "required": [
                     "description",
                     "id",
                     "name",
                     "uuid"
+                ],
+                "type": "object"
+            }
+        },
+        "pulumi:providers:onepassword/terraformConfig": {
+            "description": "This function returns a Terraform config object with terraform-namecased keys,to be used with the Terraform Module Provider.",
+            "inputs": {
+                "properties": {
+                    "__self__": {
+                        "type": "ref",
+                        "$ref": "#/provider"
+                    }
+                },
+                "type": "pulumi:providers:onepassword/terraformConfig",
+                "required": [
+                    "__self__"
                 ]
+            },
+            "outputs": {
+                "properties": {
+                    "result": {
+                        "additionalProperties": {
+                            "$ref": "pulumi.json#/Any"
+                        },
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "result"
+                ],
+                "type": "object"
             }
         }
     }
