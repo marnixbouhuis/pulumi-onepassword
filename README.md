@@ -1,5 +1,7 @@
 # 1Password Pulumi provider
 
+Forked from https://github.com/1Password/pulumi-onepassword, updated to terraform provider version [v3.3.1](https://github.com/1Password/terraform-provider-onepassword/releases/tag/v3.3.1).
+
 Use the 1Password Pulumi provider to access and manage items in your 1Password vaults.
 
 ## Installing

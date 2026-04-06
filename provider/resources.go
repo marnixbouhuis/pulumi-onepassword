@@ -28,7 +28,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 
 	"github.com/1Password/pulumi-onepassword/provider/pkg/version"
-	onepassword "github.com/1Password/terraform-provider-onepassword/v2/providerlink"
+	onepassword "github.com/1Password/terraform-provider-onepassword/v3/providerlink"
 )
 
 // all of the token components used below.
